@@ -18,11 +18,13 @@ import android.view.View;
  * </pre>
  */
 public class SolarexNumberProgressbar extends View {
+    private static final String TAG = SolarexNumberProgressbar.class.getSimpleName();
+
     private static final int DEFAULT_MAX = 100;
     private static final int DEFAULT_PROGRESS = 0;
     private static final int DEFAULT_PROGRESSCOLOR = Color.parseColor("#3385EE");
     private static final int DEFAULT_UNFINISHCOLOR = Color.parseColor("#E1E4E7");
-    private static final int DEFAULT_TEXTCOLOR = Color.parseColor("#FFFFFF");
+    private static final int DEFAULT_TEXTCOLOR = Color.parseColor("#ffffff");
 
     private static int DEFAULT_WIDTH;
     private static int DEFAULT_HEIGHT;
@@ -41,7 +43,7 @@ public class SolarexNumberProgressbar extends View {
 
     private int mWidth, mHeight, mProgressWidth;
     private RectF mTopRectF;
-    private RectF mUnfinishRectF;
+    private RectF mUnfinishRectFL, mUnfinishRectFR;
     private RectF mProgressRectF;
 
     private int mTopRectWidth, mTopRectHeight;
@@ -56,6 +58,8 @@ public class SolarexNumberProgressbar extends View {
     private int mCircleStrokeWidth;
     private int mCircleRadius;
     private int mCircleY;
+
+    private float mTextWidth;
 
     public SolarexNumberProgressbar(Context context) {
         this(context, null);
@@ -76,7 +80,7 @@ public class SolarexNumberProgressbar extends View {
                 .SolarexNumberProgressbar);
 
         DEFAULT_WIDTH = ViewUtils.dp2px(context, 250);
-        DEFAULT_HEIGHT = ViewUtils.dp2px(context, 32.5f);
+        DEFAULT_HEIGHT = ViewUtils.dp2px(context, 40f);
         DEFAULT_TEXTSIZE = ViewUtils.dp2px(context, 10);
 
         if (typedArray != null) {
@@ -124,6 +128,8 @@ public class SolarexNumberProgressbar extends View {
         mProgressRectHeight = ViewUtils.dp2px(context, 4);
 
         mCircleY = mProgressRectTop + mProgressRectHeight / 2;
+
+        setProgress(mProgress);
     }
 
     @Override
@@ -141,10 +147,14 @@ public class SolarexNumberProgressbar extends View {
 
         float unfinishRectTop = mProgressRectTop;
         float unfinishRectBottom = mProgressRectTop + mProgressRectHeight;
-        float unfinishRectLeft = mHalfTopRectWidth;
-        float unfinishRectRight = mWidth - mHalfTopRectWidth;
+        float unfinishRectLLeft = mHalfTopRectWidth + mCircleRadius;
+        float unfinishRectLRight = mHalfTopRectWidth + mTopRectLeft - mCircleRadius;
+        float unfinishRectRLeft = mHalfTopRectWidth + mTopRectLeft + mCircleRadius;
+        float unfinishRectRRight = mWidth - mHalfTopRectWidth - mCircleRadius;
 
-        mUnfinishRectF = new RectF(unfinishRectLeft, unfinishRectTop, unfinishRectRight,
+        mUnfinishRectFL = new RectF(unfinishRectLLeft, unfinishRectTop, unfinishRectLRight,
+                unfinishRectBottom);
+        mUnfinishRectFR = new RectF(unfinishRectRLeft, unfinishRectTop, unfinishRectRRight,
                 unfinishRectBottom);
 
         float progressRectLeft = mHalfTopRectWidth;
@@ -171,9 +181,11 @@ public class SolarexNumberProgressbar extends View {
         mProgressRectF.set(mHalfTopRectWidth, mProgressRectTop, mHalfTopRectWidth + mTopRectLeft
                         - mCircleRadius,
                 mProgressRectTop + mProgressRectHeight);
+        mProgressStrLeft = (int) (mTopRectLeft + mHalfTopRectWidth - mTextWidth / 2.0f);
         canvas.drawRoundRect(mTopRectF, 4, 4, mProgressColorPaint);
         canvas.drawText(mProgressStr, mProgressStrLeft, mTextBaseLine, mTextPaint);
-        canvas.drawRoundRect(mUnfinishRectF, 4, 4, mUnfinishColorPaint);
+        canvas.drawRoundRect(mUnfinishRectFL, 4, 4, mUnfinishColorPaint);
+        canvas.drawRoundRect(mUnfinishRectFR, 4, 4, mUnfinishColorPaint);
         canvas.drawRoundRect(mProgressRectF, 4, 4, mProgressColorPaint);
         canvas.drawCircle(mHalfTopRectWidth + mTopRectLeft, mCircleY, mCircleRadius, mCirclePaint);
     }
@@ -184,7 +196,7 @@ public class SolarexNumberProgressbar extends View {
         mTopRectLeft = mProgressWidth * mProgress * 1.0f / mMax;
 
         mProgressStr = progress + "%";
-        float textwidth = mTextPaint.measureText(mProgressStr);
-        mProgressStrLeft = (int) (mTopRectLeft + mHalfTopRectWidth - textwidth / 2.0f);
+        mTextWidth = mTextPaint.measureText(mProgressStr);
+        postInvalidate();
     }
 }

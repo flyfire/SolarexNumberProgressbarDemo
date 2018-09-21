@@ -5,8 +5,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".MainActivity">
 
+    <com.solarexsoft.solarexnumberprogressbar.SolarexNumberProgressbar
+        android:id="@+id/snp_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:progresscolor="#00ff00"
+        app:unfinishedcolor="@color/colorAccent"/>
 
+    <com.solarexsoft.solarexnumberprogressbar.SolarexNumberProgressbar
+        android:id="@+id/snp_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:progress="70"
+        app:progresscolor="#00ff00"
+        app:unfinishedcolor="@color/colorAccent"/>
 
+    <com.solarexsoft.solarexnumberprogressbar.SolarexNumberProgressbar
+        android:id="@+id/snp_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:progress="100"
+        app:progresscolor="#00ff00"
+        app:unfinishedcolor="@color/colorAccent"/>
+
+    <com.solarexsoft.solarexnumberprogressbar.SolarexNumberProgressbar
+        android:id="@+id/snp_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:progress="50"
+        app:progresscolor="#00ff00"
+        app:unfinishedcolor="@color/colorAccent"/>
+
+    <com.solarexsoft.solarexnumberprogressbar.SolarexNumberProgressbar
+        android:id="@+id/snp_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:progresscolor="#00ff00"
+        app:unfinishedcolor="@color/colorAccent"/>
 </LinearLayout>
