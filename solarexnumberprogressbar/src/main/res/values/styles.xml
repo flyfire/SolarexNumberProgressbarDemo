@@ -1,0 +1,8 @@
+<resources>
+    <declare-styleable name="SolarexNumberProgressbar">
+        <attr name="max" format="integer"/>
+        <attr name="progress" format="integer"/>
+        <attr name="progresscolor" format="color"/>
+        <attr name="unfinishedcolor" format="color"/>
+    </declare-styleable>
+</resources>
