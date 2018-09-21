@@ -2,8 +2,10 @@ package com.solarexsoft.solarexnumberprogressbar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -20,15 +22,32 @@ public class SolarexNumberProgressbar extends View {
     private static final int DEFAULT_PROGRESS = 0;
     private static final int DEFAULT_PROGRESSCOLOR = Color.parseColor("#3385EE");
     private static final int DEFAULT_UNFINISHCOLOR = Color.parseColor("#E1E4E7");
+    private static final int DEFAULT_TEXTCOLOR = Color.parseColor("#FFFFFF");
 
     private static int DEFAULT_WIDTH;
     private static int DEFAULT_HEIGHT;
+    private static int DEFAULT_TEXTSIZE;
 
     private Paint mProgressColorPaint;
     private Paint mTextPaint;
     private Paint mUnfinishColorPaint;
 
-    private int mMax, mProgress, mProgressColor, mUnfinishColor;
+    private int mMax, mProgress, mProgressColor, mUnfinishColor, mTextColor;
+    private float mTextSize;
+    private float mTextBaseLine;
+    private int mOffsetX;
+    private int mOffset;
+
+    private int mWidth, mHeight, mProgressWidth;
+    private RectF mTopRectF;
+    private RectF mUnfinishRectF;
+    private RectF mProgressRectF;
+
+    private int mTopRectWidth, mTopRectHeight;
+    private float mTopRectLeft;
+
+    private int mProgressRectHeight;
+    private int mProgressRectTop;
 
     public SolarexNumberProgressbar(Context context) {
         this(context, null);
@@ -47,11 +66,87 @@ public class SolarexNumberProgressbar extends View {
     private void init(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable
                 .SolarexNumberProgressbar);
+
+        DEFAULT_WIDTH = ViewUtils.dp2px(context, 250);
+        DEFAULT_HEIGHT = ViewUtils.dp2px(context, 32.5f);
+        DEFAULT_TEXTSIZE = ViewUtils.dp2px(context, 10);
+
         if (typedArray != null) {
             mMax = typedArray.getInteger(R.styleable.SolarexNumberProgressbar_max, DEFAULT_MAX);
             mProgress = typedArray.getInteger(R.styleable.SolarexNumberProgressbar_progress,
                     DEFAULT_PROGRESS);
-
+            mProgressColor = typedArray.getColor(R.styleable
+                    .SolarexNumberProgressbar_progresscolor, DEFAULT_PROGRESSCOLOR);
+            mUnfinishColor = typedArray.getColor(R.styleable
+                    .SolarexNumberProgressbar_unfinishedcolor, DEFAULT_UNFINISHCOLOR);
+            mTextColor = typedArray.getColor(R.styleable.SolarexNumberProgressbar_textcolor,
+                    DEFAULT_TEXTCOLOR);
+            mTextSize = typedArray.getDimension(R.styleable.SolarexNumberProgressbar_textsize,
+                    DEFAULT_TEXTSIZE);
+            typedArray.recycle();
         }
+
+
+        mProgressColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mProgressColorPaint.setColor(mProgressColor);
+
+        mUnfinishColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mUnfinishColorPaint.setColor(mUnfinishColor);
+
+        mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mTextPaint.setColor(mTextColor);
+        mTextPaint.setTextSize(mTextSize);
+        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+        float dy = (fontMetrics.descent - fontMetrics.ascent) / 2 - fontMetrics.descent;
+        mTextBaseLine = ViewUtils.dp2px(context, 7.5f) + dy;
+
+        mOffsetX = ViewUtils.dp2px(context, 15);
+        mOffset = ViewUtils.dp2px(context, 30);
+        mTopRectWidth = ViewUtils.dp2px(context, 30);
+        mTopRectHeight = ViewUtils.dp2px(context, 15);
+
+        mProgressRectTop = ViewUtils.dp2px(context, 27.5f);
+        mProgressRectHeight = ViewUtils.dp2px(context, 4);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mWidth = w;
+        mHeight = h;
+        mProgressWidth = mWidth - mOffset;
+        mTopRectLeft = mProgressWidth * mProgress * 1.0f / mMax;
+        float topRectRight = mTopRectLeft + mTopRectWidth;
+        float topRectBottom = mTopRectHeight;
+
+        mTopRectF = new RectF(mTopRectLeft, 0, topRectRight, topRectBottom);
+
+        float unfinishRectTop = mProgressRectTop;
+        float unfinishRectBottom = mProgressRectTop + mProgressRectHeight;
+        float unfinishRectLeft = mOffsetX;
+        float unfinishRectRight = mWidth - mOffsetX;
+
+        mUnfinishRectF = new RectF(unfinishRectLeft, unfinishRectTop, unfinishRectRight,
+                unfinishRectBottom);
+
+        float progressRectLeft = mOffsetX;
+        float progressRectTop = mProgressRectTop;
+        float progressRectRight = mOffsetX + mTopRectLeft;
+        float progressRectBottom = mProgressRectTop + mProgressRectHeight;
+
+        mProgressRectF = new RectF(progressRectLeft, progressRectTop, progressRectRight, progressRectBottom);
+
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = ViewUtils.measure(widthMeasureSpec, DEFAULT_WIDTH);
+        int height = ViewUtils.measure(heightMeasureSpec, DEFAULT_HEIGHT);
+        setMeasuredDimension(width, height);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
     }
 }
