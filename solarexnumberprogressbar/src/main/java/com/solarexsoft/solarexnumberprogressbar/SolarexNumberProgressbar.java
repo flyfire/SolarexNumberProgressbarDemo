@@ -31,11 +31,12 @@ public class SolarexNumberProgressbar extends View {
     private Paint mProgressColorPaint;
     private Paint mTextPaint;
     private Paint mUnfinishColorPaint;
+    private Paint mCirclePaint;
 
     private int mMax, mProgress, mProgressColor, mUnfinishColor, mTextColor;
     private float mTextSize;
     private float mTextBaseLine;
-    private int mOffsetX;
+    private int mHalfTopRectWidth;
     private int mOffset;
 
     private int mWidth, mHeight, mProgressWidth;
@@ -48,6 +49,13 @@ public class SolarexNumberProgressbar extends View {
 
     private int mProgressRectHeight;
     private int mProgressRectTop;
+
+    private String mProgressStr;
+    private int mProgressStrLeft;
+
+    private int mCircleStrokeWidth;
+    private int mCircleRadius;
+    private int mCircleY;
 
     public SolarexNumberProgressbar(Context context) {
         this(context, null);
@@ -100,13 +108,22 @@ public class SolarexNumberProgressbar extends View {
         float dy = (fontMetrics.descent - fontMetrics.ascent) / 2 - fontMetrics.descent;
         mTextBaseLine = ViewUtils.dp2px(context, 7.5f) + dy;
 
-        mOffsetX = ViewUtils.dp2px(context, 15);
+        mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mCirclePaint.setColor(mProgressColor);
+        mCirclePaint.setStyle(Paint.Style.STROKE);
+        mCircleStrokeWidth = ViewUtils.dp2px(context, 3);
+        mCirclePaint.setStrokeWidth(mCircleStrokeWidth);
+        mCircleRadius = ViewUtils.dp2px(context, 5);
+
+        mHalfTopRectWidth = ViewUtils.dp2px(context, 15);
         mOffset = ViewUtils.dp2px(context, 30);
         mTopRectWidth = ViewUtils.dp2px(context, 30);
         mTopRectHeight = ViewUtils.dp2px(context, 15);
 
         mProgressRectTop = ViewUtils.dp2px(context, 27.5f);
         mProgressRectHeight = ViewUtils.dp2px(context, 4);
+
+        mCircleY = mProgressRectTop + mProgressRectHeight / 2;
     }
 
     @Override
@@ -116,6 +133,7 @@ public class SolarexNumberProgressbar extends View {
         mHeight = h;
         mProgressWidth = mWidth - mOffset;
         mTopRectLeft = mProgressWidth * mProgress * 1.0f / mMax;
+
         float topRectRight = mTopRectLeft + mTopRectWidth;
         float topRectBottom = mTopRectHeight;
 
@@ -123,18 +141,19 @@ public class SolarexNumberProgressbar extends View {
 
         float unfinishRectTop = mProgressRectTop;
         float unfinishRectBottom = mProgressRectTop + mProgressRectHeight;
-        float unfinishRectLeft = mOffsetX;
-        float unfinishRectRight = mWidth - mOffsetX;
+        float unfinishRectLeft = mHalfTopRectWidth;
+        float unfinishRectRight = mWidth - mHalfTopRectWidth;
 
         mUnfinishRectF = new RectF(unfinishRectLeft, unfinishRectTop, unfinishRectRight,
                 unfinishRectBottom);
 
-        float progressRectLeft = mOffsetX;
+        float progressRectLeft = mHalfTopRectWidth;
         float progressRectTop = mProgressRectTop;
-        float progressRectRight = mOffsetX + mTopRectLeft;
+        float progressRectRight = mHalfTopRectWidth + mTopRectLeft - mCircleRadius;
         float progressRectBottom = mProgressRectTop + mProgressRectHeight;
 
-        mProgressRectF = new RectF(progressRectLeft, progressRectTop, progressRectRight, progressRectBottom);
+        mProgressRectF = new RectF(progressRectLeft, progressRectTop, progressRectRight,
+                progressRectBottom);
 
     }
 
@@ -148,5 +167,24 @@ public class SolarexNumberProgressbar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        mTopRectF.set(mTopRectLeft, 0, mTopRectLeft + mTopRectWidth, mTopRectHeight);
+        mProgressRectF.set(mHalfTopRectWidth, mProgressRectTop, mHalfTopRectWidth + mTopRectLeft
+                        - mCircleRadius,
+                mProgressRectTop + mProgressRectHeight);
+        canvas.drawRoundRect(mTopRectF, 4, 4, mProgressColorPaint);
+        canvas.drawText(mProgressStr, mProgressStrLeft, mTextBaseLine, mTextPaint);
+        canvas.drawRoundRect(mUnfinishRectF, 4, 4, mUnfinishColorPaint);
+        canvas.drawRoundRect(mProgressRectF, 4, 4, mProgressColorPaint);
+        canvas.drawCircle(mHalfTopRectWidth + mTopRectLeft, mCircleY, mCircleRadius, mCirclePaint);
+    }
+
+    public void setProgress(int progress) {
+        mProgress = progress;
+
+        mTopRectLeft = mProgressWidth * mProgress * 1.0f / mMax;
+
+        mProgressStr = progress + "%";
+        float textwidth = mTextPaint.measureText(mProgressStr);
+        mProgressStrLeft = (int) (mTopRectLeft + mHalfTopRectWidth - textwidth / 2.0f);
     }
 }
