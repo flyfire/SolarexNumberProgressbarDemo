@@ -184,9 +184,17 @@ public class SolarexNumberProgressbar extends View {
         mProgressStrLeft = (int) (mTopRectLeft + mHalfTopRectWidth - mTextWidth / 2.0f);
         canvas.drawRoundRect(mTopRectF, 4, 4, mProgressColorPaint);
         canvas.drawText(mProgressStr, mProgressStrLeft, mTextBaseLine, mTextPaint);
-        canvas.drawRoundRect(mUnfinishRectFL, 4, 4, mUnfinishColorPaint);
-        canvas.drawRoundRect(mUnfinishRectFR, 4, 4, mUnfinishColorPaint);
-        canvas.drawRoundRect(mProgressRectF, 4, 4, mProgressColorPaint);
+        mUnfinishRectFL.set(mHalfTopRectWidth + mCircleRadius, mProgressRectTop, mHalfTopRectWidth + mTopRectLeft - mCircleRadius, mProgressRectTop + mProgressRectHeight);
+        mUnfinishRectFR.set(mHalfTopRectWidth + mTopRectLeft + mCircleRadius, mProgressRectTop, mWidth - mHalfTopRectWidth - mCircleRadius, mProgressRectTop + mProgressRectHeight);
+        if ((mHalfTopRectWidth + mTopRectLeft - mCircleRadius >= mHalfTopRectWidth + mCircleRadius)) {
+            canvas.drawRoundRect(mUnfinishRectFL, 5, 5, mUnfinishColorPaint);
+        }
+        if ((mWidth - mHalfTopRectWidth - mCircleRadius >= mHalfTopRectWidth + mTopRectLeft + mCircleRadius)) {
+            canvas.drawRoundRect(mUnfinishRectFR, 5, 5, mUnfinishColorPaint);
+        }
+        if (mHalfTopRectWidth + mTopRectLeft - mCircleRadius >= mHalfTopRectWidth) {
+            canvas.drawRoundRect(mProgressRectF, 4, 4, mProgressColorPaint);
+        }
         canvas.drawCircle(mHalfTopRectWidth + mTopRectLeft, mCircleY, mCircleRadius, mCirclePaint);
     }
 
@@ -198,5 +206,9 @@ public class SolarexNumberProgressbar extends View {
         mProgressStr = progress + "%";
         mTextWidth = mTextPaint.measureText(mProgressStr);
         postInvalidate();
+    }
+
+    public int getProgress() {
+        return mProgress;
     }
 }

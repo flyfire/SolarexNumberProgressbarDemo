@@ -12,9 +12,7 @@
     <com.solarexsoft.solarexnumberprogressbar.SolarexNumberProgressbar
         android:id="@+id/snp_1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:progresscolor="#00ff00"
-        app:unfinishedcolor="@color/colorAccent"/>
+        android:layout_height="wrap_content"/>
 
     <com.solarexsoft.solarexnumberprogressbar.SolarexNumberProgressbar
         android:id="@+id/snp_2"
